@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Hermes – Trading Journal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f2f4f8;--panel:#fff;--side:#12213a;--side-t:#c9d4e8;--ink:#17233a;--mute:#6a7690;--line:#e1e6ee;--acc:#3563e9;--win:#12906a;--loss:#d13f58;--field:#f7f8fb;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d1626;--panel:#15233b;--side:#0a1220;--side-t:#a9b8d3;--ink:#e6ecf7;--mute:#8696b3;--line:#24344f;--acc:#6d93ff;--win:#35c796;--loss:#ff6b82;--field:#101c31;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0d1626;--panel:#15233b;--side:#0a1220;--side-t:#a9b8d3;--ink:#e6ecf7;--mute:#8696b3;--line:#24344f;--acc:#6d93ff;--win:#35c796;--loss:#ff6b82;--field:#101c31;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "IBM Plex Sans",system-ui,sans-serif}
+h1,h2,h3,.num{font-family:"Bricolage Grotesque","IBM Plex Sans",sans-serif;margin:0}
+.app{display:grid;grid-template-columns:260px 1fr;min-height:100vh}
+aside{background:var(--side);color:var(--side-t);padding:22px 16px;display:flex;flex-direction:column;gap:6px}
+.brand{font:700 26px "Bricolage Grotesque",sans-serif;color:#fff;padding:0 8px 14px}
+.brand small{display:block;font:400 12px "IBM Plex Sans",sans-serif;color:var(--side-t);opacity:.8}
+.jl{display:block;width:100%;text-align:left;background:none;border:0;color:inherit;padding:10px;border-radius:8px;cursor:pointer;font:inherit}
+.jl b{display:block;color:#fff;font-weight:600}.jl span{font-size:12px;opacity:.75}
+.jl:hover{background:#ffffff14}.jl.on{background:#ffffff22;box-shadow:inset 3px 0 0 var(--acc)}
+.add{margin-top:8px;border:1px dashed #ffffff44;color:#fff}
+main{padding:26px;min-width:0}
+.top{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:18px}
+.top h2{font-size:26px}.top p{margin:2px 0 0;color:var(--mute)}
+button,.btn{font:inherit;cursor:pointer}
+.b{background:var(--acc);color:#fff;border:0;border-radius:8px;padding:8px 14px;font-weight:500}
+.b.g{background:var(--panel);color:var(--ink);border:1px solid var(--line)}
+.b.d{color:var(--loss)}
+.b:focus-visible,.jl:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}
+.st{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px}
+.st small{color:var(--mute)}.st .num{font-size:26px;display:block}
+.win{color:var(--win)}.loss{color:var(--loss)}
+.row2{display:grid;grid-template-columns:2fr 1fr;gap:12px;margin-bottom:16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;min-width:0}
+.card h3{font-size:17px;margin-bottom:10px}
+.cat{display:grid;grid-template-columns:90px 1fr auto;gap:8px;align-items:center;margin:8px 0;font-size:14px}
+.bar{height:8px;border-radius:4px;background:var(--line);overflow:hidden;position:relative}
+.bar i{position:absolute;top:0;bottom:0;border-radius:4px}
+.tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
+.chips button{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:20px;padding:4px 12px}
+.chips button.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px;white-space:nowrap}
+th{text-align:left;color:var(--mute);font-weight:500;padding:8px;border-bottom:1px solid var(--line)}
+td{padding:8px;border-bottom:1px solid var(--line)}
+.tag{background:var(--field);border:1px solid var(--line);border-radius:6px;padding:1px 8px;font-size:12px}
+.empty{padding:28px;text-align:center;color:var(--mute)}
+dialog{border:1px solid var(--line);border-radius:12px;background:var(--panel);color:var(--ink);padding:20px;width:min(480px,94vw)}
+dialog::backdrop{background:#0008}
+label{display:block;font-size:13px;color:var(--mute);margin:10px 0 3px}
+input,select,textarea{width:100%;font:inherit;background:var(--field);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.acts{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+.note{font-size:13px;color:var(--mute);margin:6px 0}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.cal .h{color:var(--mute);font-size:13px;text-align:center;padding:4px}
+.day{min-height:78px;border-radius:8px;padding:6px 8px;background:var(--field);border:1px solid var(--line);font-size:13px;display:flex;flex-direction:column;justify-content:space-between}
+.day.w{background:color-mix(in srgb,var(--win) 24%,var(--panel));border-color:var(--win)}
+.day.l{background:color-mix(in srgb,var(--loss) 24%,var(--panel));border-color:var(--loss)}
+.day.o{visibility:hidden}
+.day small{color:var(--mute)}
+@media (max-width:820px){.day{min-height:58px;padding:4px;font-size:11px}}
+@media (max-width:820px){.app{grid-template-columns:1fr}aside{flex-direction:row;overflow-x:auto;align-items:center}.brand{padding:0 10px 0 0}.jl{min-width:150px}.row2{grid-template-columns:1fr}main{padding:16px}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside id="side"></aside>
+<main id="main"></main>
+</div>
+
+<dialog id="dJ"><form method="dialog" onsubmit="return false"><h3>New journal</h3>
+<label>Journal name</label><input id="jn" placeholder="e.g. Prop firm challenge">
+<div class="g2"><div><label>MT5 account number</label><input id="ja" inputmode="numeric" placeholder="e.g. 51234567"></div>
+<div><label>Broker / server</label><input id="jb" placeholder="e.g. Exness-MT5Real"></div></div>
+<div class="g2"><div><label>Starting balance</label><input id="jbal" type="number" step="any" value="10000"></div>
+<div><label>Currency</label><input id="jc" value="USD"></div></div>
+<div class="acts"><button class="b g" onclick="dJ.close()">Cancel</button><button class="b" onclick="saveJ()">Create journal</button></div></form></dialog>
+
+<dialog id="dT"><form method="dialog" onsubmit="return false"><h3>Log a trade</h3>
+<div class="g2"><div><label>Symbol</label><input id="ts" placeholder="EURUSD" oninput="autoCat()"></div>
+<div><label>Category</label><select id="tc"></select></div></div>
+<div class="g2"><div><label>Direction</label><select id="tt"><option>buy</option><option>sell</option></select></div>
+<div><label>Volume (lots)</label><input id="tv" type="number" step="any" value="0.1"></div></div>
+<div class="g2"><div><label>Open price</label><input id="tpo" type="number" step="any"></div>
+<div><label>Close price</label><input id="tpc" type="number" step="any"></div></div>
+<div class="g2"><div><label>Opened</label><input id="to" type="datetime-local"></div>
+<div><label>Closed</label><input id="tx" type="datetime-local"></div></div>
+<label>Net result (profit after commission and swap)</label><input id="tp" type="number" step="any">
+<label>Notes</label><textarea id="tn" rows="2" placeholder="Setup, mistakes, lessons"></textarea>
+<div class="acts"><button class="b g" onclick="dT.close()">Cancel</button><button class="b" onclick="saveT()">Save trade</button></div></form></dialog>
+
+<dialog id="dI"><h3>Import from MT5</h3>
+<p class="note">In MT5, open the <b>History</b> tab, set the period, right-click and choose <b>Report</b> then <b>Open XML</b>, or copy the Positions table into a CSV. Choose that CSV here. Trades already in this journal are skipped.</p>
+<input type="file" id="fi" accept=".csv,.tsv,.txt">
+<div id="imsg" class="note"></div>
+<div class="acts"><button class="b g" onclick="dI.close()">Close</button><button class="b" onclick="doImport()">Import trades</button></div></dialog>
+
+<dialog id="dF"><h3>Customer care</h3><p class="note">Tell us what works, what does not, and what you want improved.</p>
+<label>Type</label><select id="fty"><option>Suggestion</option><option>Problem</option><option>Praise</option></select>
+<label>Message</label><textarea id="fm" rows="4"></textarea>
+<label>Phone or email (optional, so we can reply)</label><input id="fc">
+<div id="fmsg" class="note"></div>
+<div class="acts"><button class="b g" onclick="dF.close()">Close</button><button class="b" onclick="sendF()">Send feedback</button></div></dialog>
+
+<div id="auth" style="position:fixed;inset:0;background:var(--bg);z-index:50;display:none;align-items:center;justify-content:center;padding:16px"><div class="card" style="width:min(380px,100%)"><h2 style="margin-bottom:10px">Hermes</h2><div class="tools chips" id="atabs"><button id="tl" class="on" onclick="setAM('login')">Log in</button><button id="tr" onclick="setAM('register')">Sign up</button></div><p class="note" id="asub"></p><label>Email</label><input id="ae" type="email" autocomplete="username"><div id="acdw" style="display:none"><label>Verification code from your email</label><input id="acd" inputmode="numeric" maxlength="6" autocomplete="one-time-code"></div><div id="apw"><label id="apl">Password (8+ characters)</label><input id="ap" type="password"></div><div id="acw" style="display:none"><label>Confirm password</label><input id="ap2" type="password" autocomplete="new-password"></div><div id="amsg" class="note loss"></div><div class="acts" style="justify-content:space-between"><a id="afg" href="#" style="align-self:center;color:var(--acc)">Forgot password?</a><button class="b" id="ago" onclick="auth()">Log in</button></div></div></div>
+<dialog id="dP"><h3>Change password</h3><p class="note">We email a 6-digit code to your account email to confirm it is you.</p><button class="b g" id="pbs" onclick="sendPC()">Email me a code</button><div id="pf" style="display:none"><label>Verification code</label><input id="pc" inputmode="numeric" maxlength="6" autocomplete="one-time-code"><label>New password (8+ characters)</label><input id="pn" type="password" autocomplete="new-password"><label>Confirm new password</label><input id="pn2" type="password" autocomplete="new-password"></div><div id="pm" class="note"></div><div class="acts"><button class="b g" onclick="dP.close()">Close</button><button class="b" id="pgo" onclick="changeP()" style="display:none">Change password</button></div></dialog>
+<dialog id="dK"><h3>Connect MT5</h3><p class="note">Install the HermesSync expert advisor on this MT5 account and paste these two values into its inputs.</p><label>Server URL</label><input id="ku" readonly onclick="this.select()"><label>Journal key (keep private)</label><input id="kk" readonly onclick="this.select()"><p class="note">Also allow the server URL in MT5: Tools, Options, Expert Advisors, Allow WebRequest for listed URL.</p><div class="acts"><button class="b" onclick="dK.close()">Done</button></div></dialog>
+<script>
+const CATS=["Forex","Indices","Metals","Crypto","Commodities","Stocks","Other"];
+let S={journals:[],active:null,filter:"All",view:"journal",cm:""};
+
+const save=()=>{};
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const uid=()=>Math.random().toString(36).slice(2,10);
+const J=()=>S.journals.find(j=>j.id===S.active);
+const fmt=(n,c="")=>(n<0?"−":"")+Math.abs(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})+(c?" "+c:"");
+
+function guess(sym){
+ const s=(sym||"").toUpperCase().replace(/[^A-Z0-9]/g,"");
+ if(/^(XAU|XAG|XPT|XPD)/.test(s))return"Metals";
+ if(/(BTC|ETH|LTC|XRP|SOL|DOGE|ADA|BNB)/.test(s))return"Crypto";
+ if(/(US30|US500|US100|NAS|SPX|NDX|DJ|GER|DAX|UK100|FTSE|JP225|NIK|HK50|FRA40|AUS200|USTEC|DE40|DE30|EU50|VIX)/.test(s))return"Indices";
+ if(/(OIL|WTI|BRENT|UKO|USO|NGAS|NATGAS|COPPER|COFFEE|COCOA|SUGAR|WHEAT|CORN)/.test(s))return"Commodities";
+ const cur="USD EUR GBP JPY CHF CAD AUD NZD SEK NOK DKK PLN MXN ZAR TRY SGD HKD CNH HUF CZK".split(" ");
+ if(s.length>=6&&cur.includes(s.slice(0,3))&&cur.includes(s.slice(3,6)))return"Forex";
+ if(/^[A-Z]{1,5}$/.test(s))return"Stocks";
+ return"Other";
+}
+
+/* ---------- render ---------- */
+function render(){
+ const side=$("side");
+ side.innerHTML='<div class="brand">Hermes<small>Trading journals</small></div>'+
+  S.journals.map(j=>`<button class="jl ${j.id===S.active?"on":""}" onclick="pick('${j.id}')"><b>${esc(j.name)}</b><span>MT5 #${esc(j.account||"—")} · ${j.trades.length} trades</span></button>`).join("")+
+  '<button class="jl add" onclick="openJ()"><b>+ New journal</b></button><button class="jl" onclick="openF()" style="margin-top:auto"><b>Customer care</b><span>Send feedback or ideas</span></button><div class="note" style="padding:0 10px;color:var(--side-t)">'+syncMsg+'</div>';
+ const j=J(),m=$("main");
+ if(!j){m.innerHTML='<div class="empty"><h2>Start your first journal</h2><p>Create one journal for each MT5 account you trade. Hermes keeps their results separate.</p><button class="b" onclick="openJ()">Create journal</button></div>';return}
+ const cur=j.currency||"";
+ const all=[...j.trades].sort((a,b)=>(a.closed||"").localeCompare(b.closed||""));
+ const net=all.reduce((s,t)=>s+t.pnl,0),wins=all.filter(t=>t.pnl>0),losses=all.filter(t=>t.pnl<0);
+ const gw=wins.reduce((s,t)=>s+t.pnl,0),gl=-losses.reduce((s,t)=>s+t.pnl,0);
+ const pf=gl?gw/gl:(gw?Infinity:0), wr=all.length?wins.length/all.length*100:0;
+ const bal=(+j.balance||0)+net;
+ const cls=n=>n>0?"win":n<0?"loss":"";
+ const cats=CATS.map(c=>{const t=all.filter(x=>x.cat===c);return{c,n:t.length,p:t.reduce((s,x)=>s+x.pnl,0)}}).filter(x=>x.n);
+ const mx=Math.max(1,...cats.map(x=>Math.abs(x.p)));
+ const tabs=`<div class='tools chips'><button class='${S.view!=='calendar'?'on':''}' onclick='setV(0)'>Overview</button><button class='${S.view==='calendar'?'on':''}' onclick='setV(1)'>Calendar</button></div>`;
+ const cal=S.view==='calendar'?calendar(all,cur):'';
+ const shown=all.filter(t=>S.filter==="All"||t.cat===S.filter).reverse();
+ m.innerHTML=`
+ <div class="top"><div><h2>${esc(j.name)}</h2><p>MT5 account #${esc(j.account||"—")}${j.broker?" · "+esc(j.broker):""}</p></div>
+ <div><button class="b g" onclick="openK()">Connect MT5</button> <button class="b g" onclick="dI.showModal()">Import CSV</button> <button class="b" onclick="openT()">Log trade</button> <button class="b g d" onclick="delJ()">Delete journal</button></div></div>
+ <div class="stats">
+  <div class="st"><small>Balance</small><span class="num">${fmt(bal,cur)}</span></div>
+  <div class="st"><small>Net result</small><span class="num ${cls(net)}">${fmt(net,cur)}</span></div>
+  <div class="st"><small>Win rate</small><span class="num">${wr.toFixed(1)}%</span></div>
+  <div class="st"><small>Profit factor</small><span class="num">${pf===Infinity?"∞":pf.toFixed(2)}</span></div>
+  <div class="st"><small>Trades</small><span class="num">${all.length}</span></div>
+  <div class="st"><small>Avg win / loss</small><span class="num" style="font-size:20px"><span class="win">${fmt(wins.length?gw/wins.length:0)}</span> / <span class="loss">${fmt(losses.length?-gl/losses.length:0)}</span></span></div>
+ </div>
+ ${tabs}${cal}<div class="row2" style="${S.view==='calendar'?'display:none':''}">
+  <div class="card"><h3>Equity curve</h3>${curve(all,+j.balance||0)}</div>
+  <div class="card"><h3>By category</h3>${cats.length?cats.map(x=>`<div class="cat"><span>${x.c} <small style="color:var(--mute)">${x.n}</small></span><div class="bar"><i style="left:${x.p>=0?0:100-Math.abs(x.p)/mx*100}%;width:${Math.abs(x.p)/mx*100}%;background:var(${x.p>=0?"--win":"--loss"})"></i></div><b class="${cls(x.p)}">${fmt(x.p)}</b></div>`).join(""):'<div class="empty">No trades yet</div>'}</div>
+ </div>
+ <div class="card" style="${S.view==='calendar'?'display:none':''}"><h3>Trades</h3>
+  <div class="tools chips">${["All",...CATS].map(c=>`<button class="${S.filter===c?"on":""}" onclick="S.filter='${c}';render()">${c}</button>`).join("")}</div>
+  ${shown.length?`<div class="scroll"><table><thead><tr><th>Closed</th><th>Symbol</th><th>Category</th><th>Side</th><th>Lots</th><th>Open</th><th>Close</th><th>Result</th><th>Notes</th><th></th></tr></thead><tbody>
+  ${shown.map(t=>`<tr><td>${esc(t.closed)}</td><td><b>${esc(t.symbol)}</b></td><td><span class="tag">${esc(t.cat)}</span></td><td>${esc(t.side)}</td><td>${t.vol??""}</td><td>${t.po??""}</td><td>${t.pc??""}</td><td class="${cls(t.pnl)}"><b>${fmt(t.pnl)}</b></td><td>${esc(t.notes)}</td><td><button class="b g" onclick="delT('${t.id}')" aria-label="Delete trade">Delete</button></td></tr>`).join("")}</tbody></table></div>`:'<div class="empty">No trades here yet. Log one or import your MT5 history.</div>'}
+ </div>`;
+}
+function curve(all,start){
+ if(!all.length)return'<div class="empty">Your equity curve appears after your first trade.</div>';
+ let v=start;const pts=[v];all.forEach(t=>{v+=t.pnl;pts.push(v)});
+ const mn=Math.min(...pts),mxv=Math.max(...pts),r=(mxv-mn)||1,W=600,H=180,p=10;
+ const xy=pts.map((y,i)=>[p+i*(W-2*p)/Math.max(1,pts.length-1),H-p-(y-mn)/r*(H-2*p)]);
+ const d=xy.map((a,i)=>(i?"L":"M")+a[0].toFixed(1)+" "+a[1].toFixed(1)).join(" ");
+ const up=pts[pts.length-1]>=start;
+ return`<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto" role="img" aria-label="Equity curve"><path d="${d}" fill="none" stroke="var(${up?"--win":"--loss"})" stroke-width="2.5" stroke-linejoin="round"/></svg><div class="note">Low ${fmt(mn)} · High ${fmt(mxv)}</div>`;
+}
+
+/* ---------- actions ---------- */
+function pick(id){S.active=id;S.filter="All";save();render()}
+function openJ(){["jn","ja","jb"].forEach(i=>$(i).value="");$("jbal").value=10000;$("jc").value="USD";dJ.showModal()}
+function saveJ(){
+ const name=$("jn").value.trim();if(!name){$("jn").focus();return}
+ const j={id:uid(),name,account:$("ja").value.trim(),broker:$("jb").value.trim(),balance:+$("jbal").value||0,currency:$("jc").value.trim().toUpperCase(),trades:[]};
+ S.journals.push(j);S.active=j.id;save();dJ.close();render();
+}
+function delJ(){const j=J();if(j&&confirm("Delete “"+j.name+"” and all its trades?")){S.journals=S.journals.filter(x=>x.id!==j.id);S.active=S.journals[0]?.id||null;save();render()}}
+function openT(){$("tc").innerHTML=CATS.map(c=>`<option>${c}</option>`).join("");["ts","tpo","tpc","tp","tn","to","tx"].forEach(i=>$(i).value="");dT.showModal()}
+function autoCat(){$("tc").value=guess($("ts").value)}
+const norm=v=>v?v.replace("T"," ").replace(/-/g,"."):"";
+function saveT(){
+ const sym=$("ts").value.trim().toUpperCase(),pnl=parseFloat($("tp").value);
+ if(!sym){$("ts").focus();return}if(isNaN(pnl)){$("tp").focus();return}
+ J().trades.push({id:uid(),ticket:"",symbol:sym,cat:$("tc").value,side:$("tt").value,vol:+$("tv").value||0,po:$("tpo").value,pc:$("tpc").value,opened:norm($("to").value),closed:norm($("tx").value)||norm(new Date().toISOString().slice(0,16)),pnl,notes:$("tn").value.trim()});
+ save();dT.close();render();
+}
+function delT(id){const j=J();j.trades=j.trades.filter(t=>t.id!==id);save();render()}
+
+/* ---------- MT5 import ---------- */
+function splitLine(l,d){const o=[];let c="",q=false;for(const ch of l){if(ch=='"')q=!q;else if(ch===d&&!q){o.push(c);c=""}else c+=ch}o.push(c);return o.map(x=>x.trim())}
+const num=v=>parseFloat(String(v??"").replace(/\s/g,"").replace(/,(?=\d{3}\b)/g,"").replace(",","."));
+function parse(text){
+ const lines=text.split(/\r?\n/).filter(l=>l.trim());
+ const d=[",",";","\t"].map(x=>[x,(lines.find(l=>/symbol/i.test(l))||"").split(x).length]).sort((a,b)=>b[1]-a[1])[0][0];
+ const hi=lines.findIndex(l=>/symbol/i.test(l)&&/profit/i.test(l));
+ if(hi<0)return null;
+ const H=splitLine(lines[hi],d).map(h=>h.toLowerCase());
+ const at=(n,k=0)=>{let c=-1,i=-1;while((i=H.indexOf(n,i+1))>-1)if(c++===k)return i;return -1};
+ const ix={ticket:[at("position"),at("ticket"),at("deal")].find(i=>i>-1)??-1,symbol:at("symbol"),type:at("type"),vol:at("volume"),to:at("time"),tc:at("time",1),po:at("price"),pc:at("price",1),com:at("commission"),swap:at("swap"),profit:at("profit")};
+ const out=[];
+ for(const l of lines.slice(hi+1)){
+  const c=splitLine(l,d),g=i=>i<0?"":c[i];
+  const type=g(ix.type).toLowerCase(),sym=g(ix.symbol).toUpperCase(),profit=num(g(ix.profit));
+  if(!sym||!/^(buy|sell)$/.test(type)||isNaN(profit))continue;
+  const pnl=profit+(num(g(ix.com))||0)+(num(g(ix.swap))||0);
+  out.push({id:uid(),ticket:g(ix.ticket),symbol:sym,cat:guess(sym),side:type,vol:num(g(ix.vol))||0,po:g(ix.po),pc:g(ix.pc),opened:g(ix.to),closed:g(ix.tc)||g(ix.to),pnl,notes:""});
+ }
+ return out;
+}
+async function doImport(){
+ const f=$("fi").files[0],msg=$("imsg");
+ if(!f){msg.textContent="Choose a CSV file first.";return}
+ const rows=parse(await f.text());
+ if(!rows){msg.textContent="No MT5 trade table found. The file needs Symbol and Profit columns.";return}
+ const j=J(),have=new Set(j.trades.filter(t=>t.ticket).map(t=>t.ticket));
+ const fresh=rows.filter(t=>!t.ticket||!have.has(t.ticket));
+ j.trades.push(...fresh);save();render();
+ msg.textContent=`Imported ${fresh.length} trades. Skipped ${rows.length-fresh.length} already in this journal.`;
+}
+function setV(c){S.view=c?'calendar':'journal';render()}
+function baseM(){if(S.cm)return S.cm;const a=(J()?J().trades:[]).map(t=>t.closed||'').sort(),l=a.length?a[a.length-1].slice(0,7).replace('.','-'):'';if(/^[0-9]{4}-[0-9]{2}$/.test(l))return l;const n=new Date();return n.getFullYear()+'-'+(n.getMonth()+1)}
+function shiftM(n){let [y,m]=baseM().split('-').map(Number);m+=n;if(m<1){m=12;y--}if(m>12){m=1;y++}S.cm=y+'-'+m;render()}
+function calendar(all,cur){const [y,mo]=baseM().split('-').map(Number),key=y+'.'+String(mo).padStart(2,'0'),by={};all.forEach(t=>{const d=(t.closed||'').slice(0,10).replace(/-/g,'.');if(d.startsWith(key)){by[d]=by[d]||{p:0,n:0};by[d].p+=t.pnl;by[d].n++}});const first=new Date(y,mo-1,1),dim=new Date(y,mo,0).getDate(),lead=(first.getDay()+6)%7,c=p=>p>0?'win':p<0?'loss':'';let cells='';for(let i=0;i<lead;i++)cells+=`<div class='day o'></div>`;for(let d=1;d<=dim;d++){const r=by[key+'.'+String(d).padStart(2,'0')];cells+=`<div class='day ${r?(r.p>0?'w':r.p<0?'l':''):''}'><span>${d}</span>${r?`<b class='${c(r.p)}'>${fmt(r.p)}</b><small>${r.n} trade${r.n>1?'s':''}</small>`:''}</div>`}const dd=Object.values(by),tot=dd.reduce((s,x)=>s+x.p,0);return `<div class='card' style='margin-bottom:16px'><div class='top' style='margin-bottom:10px'><h3>${first.toLocaleString(undefined,{month:'long',year:'numeric'})}</h3><div><button class='b g' onclick='shiftM(-1)'>Previous</button> <button class='b g' onclick='shiftM(1)'>Next</button></div></div><div class='note'>Month total <b class='${c(tot)}'>${fmt(tot,cur)}</b>. ${dd.filter(x=>x.p>0).length} green days, ${dd.filter(x=>x.p<0).length} red days.</div><div class='scroll'><div class='cal' style='min-width:420px'>${['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(x=>`<div class='h'>${x}</div>`).join('')}${cells}</div></div></div>`}
+
+let DB=null,UID='',syncMsg='Saved on this device only',wrote={};
+function cloudSave(){if(!DB)return;clearTimeout(cloudSave.t);cloudSave.t=setTimeout(async()=>{try{const col=DB.collection('data/users/'+UID),ids=new Set(S.journals.map(j=>j.id));for(const j of S.journals){const s=JSON.stringify(j);if(wrote[j.id]!==s){await col.doc(j.id).set(JSON.parse(s));wrote[j.id]=s}}for(const id of Object.keys(wrote))if(!ids.has(id)){await col.doc(id).delete();delete wrote[id]}}catch(e){syncMsg='Cloud sync failed. Data is safe on this device.';render()}},1200)}
+(async()=>{try{if(!window.claude)return;const u=await claude.use('user'),db=await claude.use('db');if(!u||!db){syncMsg='Sign in to Claude to sync across devices';render();return}UID=await u.id();DB=db;const snap=await db.collection('data/users/'+UID).get(),m=new Map(S.journals.map(j=>[j.id,j]));snap.docs.forEach(d=>{const x=d.data();m.set(d.id,x);wrote[d.id]=JSON.stringify(x)});S.journals=[...m.values()];if(!J())S.active=S.journals[0]?S.journals[0].id:null;syncMsg='Synced to your account';save();render()}catch(e){syncMsg='Cloud sync unavailable'}})();
+function openF(){$('fm').value='';$('fmsg').textContent='';dF.showModal()}
+async function sendF(){const m=$('fm').value.trim(),o=$('fmsg');if(!m){$('fm').focus();return}const d={type:$('fty').value,msg:m,contact:$('fc').value.trim(),ts:Date.now(),journals:S.journals.length};try{if(!DB)throw 0;const ref=DB.doc('feedback/'+UID),s=await ref.get(),items=(s.exists&&s.data().items)||[];items.push(d);await ref.set({items});o.textContent='Thank you. Your feedback was sent to customer care.';$('fm').value=''}catch(e){try{const q=JSON.parse(localStorage.getItem('hermes:fb')||'[]');q.push(d);localStorage.setItem('hermes:fb',JSON.stringify(q))}catch(x){}o.textContent='Could not reach customer care right now. Your message is saved on this device.'}}
+if(!S.active&&S.journals.length)S.active=S.journals[0].id;
+render();
+/* ---- Hermes backend layer: accounts and server sync ---- */
+let TOKEN='',EMAIL='',poll=null;
+try{TOKEN=localStorage.getItem('hermes:token')||'';EMAIL=localStorage.getItem('hermes:email')||''}catch(e){}
+async function api(m,p,b){const r=await fetch('/api'+p,{method:m,headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},body:b?JSON.stringify(b):undefined});const j=await r.json().catch(()=>({}));if(r.status===401&&TOKEN){logout();throw new Error('Session expired')}if(!r.ok)throw new Error(j.error||'Request failed');return j}
+function showAuth(on){$('auth').style.display=on?'flex':'none'}
+let AM='login',FS=0;
+function setAM(m){AM=m;FS=0;const r=m==='register',g=m==='forgot';$('atabs').style.display=g?'none':'flex';$('tl').className=r?'':'on';$('tr').className=r?'on':'';$('apw').style.display=g?'none':'block';$('acw').style.display=r?'block':'none';$('acdw').style.display='none';$('apl').textContent='Password (8+ characters)';$('ago').textContent=g?'Send code':r?'Create account':'Log in';$('asub').textContent=g?'Enter your email and we will send a 6-digit code to unlock your account.':r?'New here? Create your account with your email and a password.':'Welcome back. Enter your email and password.';const a=$('afg');a.textContent=g?'Back to log in':'Forgot password?';a.style.display=r?'none':'';a.onclick=()=>{setAM(g?'login':'forgot');return false};$('ap').autocomplete=r?'new-password':'current-password';$('amsg').textContent='';$('amsg').className='note loss'}
+async function post(p,b){const r=await fetch('/api'+p,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)});const j=await r.json().catch(()=>({}));if(!r.ok)throw Object.assign(new Error(j.error||'Request failed'),{status:r.status});return j}
+async function auth(){const o=$('amsg');o.textContent='';o.className='note loss';try{
+ const em=$('ae').value,pw=$('ap').value;
+ if(AM==='forgot'&&FS===0){await post('/forgot',{email:em});FS=1;$('acdw').style.display='block';$('apw').style.display='block';$('acw').style.display='block';$('apl').textContent='New password (8+ characters)';$('ago').textContent='Reset password';o.className='note';o.textContent='If that email has an account, a code is on its way. It lasts 10 minutes.';return}
+ if(AM!=='login'&&pw!==$('ap2').value)throw new Error('The two passwords do not match');
+ const j=AM==='forgot'?await post('/reset',{email:em,code:$('acd').value,password:pw}):await post('/'+AM,{email:em,password:pw});
+ TOKEN=j.token;EMAIL=j.email;try{localStorage.setItem('hermes:token',TOKEN);localStorage.setItem('hermes:email',EMAIL)}catch(e){}
+ ['ap','ap2','acd'].forEach(i=>$(i).value='');setAM('login');showAuth(false);start()
+}catch(e){if(e.status===409){setAM('login');o.textContent=e.message}else o.textContent=e.message}}
+function openP(){['pc','pn','pn2'].forEach(i=>$(i).value='');$('pf').style.display='none';$('pgo').style.display='none';$('pbs').style.display='';$('pbs').textContent='Email me a code';$('pm').textContent='';dP.showModal()}
+async function sendPC(){const o=$('pm');try{await api('POST','/password/code');$('pf').style.display='block';$('pgo').style.display='';$('pbs').textContent='Send a new code';o.textContent='Code sent to '+EMAIL+'. It lasts 10 minutes.'}catch(e){o.textContent=e.message}}
+async function changeP(){const o=$('pm');try{if($('pn').value!==$('pn2').value)throw new Error('The two passwords do not match');const j=await api('POST','/password/change',{code:$('pc').value,password:$('pn').value});TOKEN=j.token;try{localStorage.setItem('hermes:token',TOKEN)}catch(e){}$('pf').style.display='none';$('pgo').style.display='none';$('pbs').style.display='none';o.textContent='Password changed. Your other devices will need to log in again.'}catch(e){o.textContent=e.message}}
+function logout(){TOKEN='';EMAIL='';try{localStorage.removeItem('hermes:token');localStorage.removeItem('hermes:email')}catch(e){}clearInterval(poll);S.journals=[];S.active=null;syncMsg='';render();showAuth(true)}
+async function load(){const r=await api('GET','/journals');S.journals=r.journals;if(!J())S.active=S.journals[0]?S.journals[0].id:null;render()}
+async function start(){syncMsg=esc(EMAIL)+"<br><u style='cursor:pointer' onclick='openP()'>Change password</u><br><u style='cursor:pointer' onclick='logout()'>Log out</u>";await load();clearInterval(poll);poll=setInterval(()=>load().catch(()=>{}),15000)}
+function openK(){const j=J();$('ku').value=location.origin+'/api/ea/trades';$('kk').value=j.apiKey;dK.showModal()}
+async function saveJ(){const name=$('jn').value.trim();if(!name){$('jn').focus();return}const j=await api('POST','/journals',{name,account:$('ja').value,broker:$('jb').value,balance:+$('jbal').value||0,currency:$('jc').value});S.active=j.id;dJ.close();await load()}
+async function delJ(){const j=J();if(j&&confirm('Delete “'+j.name+'” and all its trades?')){await api('DELETE','/journals/'+j.id);S.active=null;await load()}}
+async function saveT(){const sym=$('ts').value.trim().toUpperCase(),pnl=parseFloat($('tp').value);if(!sym){$('ts').focus();return}if(isNaN(pnl)){$('tp').focus();return}await api('POST','/journals/'+S.active+'/trades',{trades:[{symbol:sym,cat:$('tc').value,side:$('tt').value,vol:+$('tv').value||0,po:$('tpo').value,pc:$('tpc').value,opened:norm($('to').value),closed:norm($('tx').value)||norm(new Date().toISOString().slice(0,16)),pnl,notes:$('tn').value.trim()}]});dT.close();await load()}
+async function delT(id){await api('DELETE','/journals/'+S.active+'/trades/'+id);await load()}
+async function doImport(){const f=$('fi').files[0],msg=$('imsg');if(!f){msg.textContent='Choose a CSV file first.';return}const rows=parse(await f.text());if(!rows){msg.textContent='No MT5 trade table found. The file needs Symbol and Profit columns.';return}const r=await api('POST','/journals/'+S.active+'/trades',{trades:rows});await load();msg.textContent='Imported '+r.added+' trades. Skipped '+r.skipped+' already in this journal.'}
+async function sendF(){const m=$('fm').value.trim(),o=$('fmsg');if(!m){$('fm').focus();return}try{await api('POST','/feedback',{type:$('fty').value,msg:m,contact:$('fc').value});o.textContent='Thank you. Your feedback was sent to customer care.';$('fm').value=''}catch(e){o.textContent=e.message}}
+setAM('login');if(TOKEN)start().catch(()=>{});else showAuth(true);
+</script>
+</body>
+</html>

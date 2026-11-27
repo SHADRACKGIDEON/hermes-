@@ -1,0 +1,1 @@
+{"name":"hermes","version":"1.0.0","description":"Hermes trading journal with MT5 auto-sync","main":"server.js","scripts":{"start":"node server.js"},"engines":{"node":">=18"}}
